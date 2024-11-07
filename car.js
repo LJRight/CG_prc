@@ -63,21 +63,14 @@ class Car {
             loader.load(this.modelUrl, (gltf) => {
                 this.car = gltf.scene;
                 this.car.scale.set(50, 50, 50);
-                const wheelScale = 0.05;
+                const wheelScale = 0.01;
 
-                console.log("Car position:", this.car.position); // x, y, z 좌표 출력
-                const boundingBox = new THREE.Box3().setFromObject(this.car);
-                const min = boundingBox.min;
-                const max = boundingBox.max;
-                
-                console.log("Car bounding box min:", min);
-                console.log("Car bounding box max:", max);
                 // 스케일을 일관되게 설정하기 위해 본체와 바퀴 그룹을 모두 포함
                 // 바퀴 그룹을 생성하고 본체에 추가
-                const frontLeftWheelGroup = new THREE.Group();
-                const frontRightWheelGroup = new THREE.Group();
-                const rearLeftWheelGroup = new THREE.Group();
-                const rearRightWheelGroup = new THREE.Group();
+                const FL = new THREE.Group();
+                const FR = new THREE.Group();
+                const RL = new THREE.Group();
+                const RR = new THREE.Group();
 
                 this.car.traverse((child) => {
                     if (child.isMesh && child.name.startsWith('polySurface')) {
@@ -85,46 +78,52 @@ class Car {
                         if (numberMatch) {
                             const number = parseInt(numberMatch[1], 10);
                             if (number >= 1 && number <= 245) {
-                                frontLeftWheelGroup.add(child);
+                                FL.add(child);
                             } else if (number >= 246 && number <= 490) {
-                                frontRightWheelGroup.add(child);
+                                FR.add(child);
                             } else if (number >= 491 && number <= 746) {
-                                rearLeftWheelGroup.add(child);
+                                RL.add(child);
                             } else if (number >= 747 && number <= 1002) {
-                                rearRightWheelGroup.add(child);
+                                RR.add(child);
                             }
                         }
                     }
                 });
 
                 // 바퀴 그룹의 이름 설정 및 본체에 추가
-                frontLeftWheelGroup.name = 'FLW';
-                frontRightWheelGroup.name = 'FRW';
-                rearLeftWheelGroup.name = 'RLW';
-                rearRightWheelGroup.name = 'RRW';
+                FL.name = 'FLW';
+                FR.name = 'FRW';
+                RL.name = 'RLW';
+                RR.name = 'RRW';
 
-                frontLeftWheelGroup.position.set(min.x, min.y, min.z);  // 예시 좌표
-                frontRightWheelGroup.position.set(0.9, 0.5, 1.8); 
-                rearLeftWheelGroup.position.set(-0.9, 0.5, -1.8);
-                rearRightWheelGroup.position.set(0.9, 0.5, -1.8);
+                const front = 0.0135;
+                const back = -0.0136;
+                const right = -0.0095;
+                const left = 0.008;
+                const h = 0.003;
 
+                FL.position.set(left, h, front);  // 예시 좌표
+                FR.position.set(right, h, front);
+                RL.position.set(left, h, back);
+                RR.position.set(right, h, back);
+                
 
-                frontLeftWheelGroup.scale.set(wheelScale, wheelScale, wheelScale);
-                frontRightWheelGroup.scale.set(wheelScale, wheelScale, wheelScale);
-                rearLeftWheelGroup.scale.set(wheelScale, wheelScale, wheelScale);
-                rearRightWheelGroup.scale.set(wheelScale, wheelScale, wheelScale);
+                FL.scale.set(wheelScale, wheelScale, wheelScale);
+                FR.scale.set(wheelScale, wheelScale, wheelScale);
+                RL.scale.set(wheelScale, wheelScale, wheelScale);
+                RR.scale.set(wheelScale, wheelScale, wheelScale);
 
                 // 각 바퀴 그룹을 this.car 본체에 추가
-                this.car.add(frontLeftWheelGroup);
-                this.car.add(frontRightWheelGroup);
-                this.car.add(rearLeftWheelGroup);
-                this.car.add(rearRightWheelGroup);
+                this.car.add(FL);
+                this.car.add(FR);
+                this.car.add(RL);
+                this.car.add(RR);
 
                 // 각 바퀴 그룹을 this.wheels 객체에 저장
-                this.wheels.frontLeft = frontLeftWheelGroup;
-                this.wheels.frontRight = frontRightWheelGroup;
-                this.wheels.rearLeft = rearLeftWheelGroup;
-                this.wheels.rearRight = rearRightWheelGroup;
+                this.wheels.frontLeft = FL;
+                this.wheels.frontRight = FR;
+                this.wheels.rearLeft = RL;
+                this.wheels.rearRight = RR;
 
                 resolve(this.car);
             }, undefined, (error) => reject(error));
