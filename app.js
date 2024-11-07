@@ -2,7 +2,6 @@ import * as THREE from './three/build/three.module.js';
 import * as CANNON from './cannon-es/dist/cannon-es.js';
 import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
 import Car from './car.js';
-import { GLTFLoader } from './three/examples/jsm/loaders/GLTFLoader.js';
 
 var world
 var car
@@ -59,9 +58,9 @@ window.onload = function init() {
     requestAnimationFrame(animate);
     controls.update(); // OrbitControls 업데이트
     world.step(1 / 60); // 물리 엔진 업데이트
-    if (car) {
-      car.update(); // 자동차 업데이트
-    }
+    // if (car) {
+    //   car.update(); // 자동차 업데이트
+    // }
     renderer.render(scene, camera); // 씬 렌더링
   }
 
